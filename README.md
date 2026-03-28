@@ -19,6 +19,3 @@ Paste your n8n workflow JSON and get a structured analysis report — issues cat
 
 **AI Deep Scan** — pattern-level issues static analysis can't catch: architectural problems, data flow issues, deduplication gaps, suboptimal node chains
 
-## License
-
-MIT
