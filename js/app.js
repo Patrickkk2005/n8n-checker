@@ -1,5 +1,5 @@
 // URL of your mini PC server — must be HTTPS if the site is on GitHub Pages
-const API_BASE = 'https://your-mini-pc-url';
+const API_BASE = 'https://checker.n8n-xpert.online';
 
 // DOM elements
 const textarea = document.getElementById('json-input');

@@ -71,6 +71,6 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    port = 8080
+    port = 8765
     print(f'Running at http://localhost:{port} — press Ctrl+C to stop')
     HTTPServer(('127.0.0.1', port), Handler).serve_forever()
