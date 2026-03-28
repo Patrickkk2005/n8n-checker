@@ -1,0 +1,102 @@
+{
+  "name": "Daily Sales Report to Slack",
+  "nodes": [
+    {
+      "id": "b1c2d3e4-0001",
+      "name": "Run every morning at 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 9 * * *" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b1c2d3e4-0002",
+      "name": "Fetch yesterday's orders from DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [480, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) as order_count, SUM(total) as revenue FROM orders WHERE created_at >= CURRENT_DATE - INTERVAL '1 day' AND created_at < CURRENT_DATE",
+        "options": {
+          "continueOnFail": true
+        }
+      }
+    },
+    {
+      "id": "b1c2d3e4-0003",
+      "name": "Format report message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [700, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "report",
+              "value": "=📊 *Daily Sales Report*\n\nOrders: {{ $json.order_count }}\nRevenue: ${{ $json.revenue }}\nDate: {{ $now.format('yyyy-MM-dd') }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b1c2d3e4-0004",
+      "name": "Post report to #sales channel",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [920, 300],
+      "parameters": {
+        "channel": "#sales",
+        "text": "={{ $json.report }}",
+        "otherOptions": {}
+      }
+    },
+    {
+      "id": "b1c2d3e4-0005",
+      "name": "📋 Sales Report Pipeline",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 140],
+      "parameters": {
+        "content": "## Daily Sales Report\nRuns at 9am UTC every day.\nPulls yesterday's order data from Postgres and posts a summary to the #sales Slack channel.\n\nError workflow: \"Alert on Failure\" handles errors and notifies #engineering.",
+        "width": 800,
+        "height": 120
+      }
+    }
+  ],
+  "connections": {
+    "Run every morning at 9am": {
+      "main": [
+        [
+          { "node": "Fetch yesterday's orders from DB", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch yesterday's orders from DB": {
+      "main": [
+        [
+          { "node": "Format report message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format report message": {
+      "main": [
+        [
+          { "node": "Post report to #sales channel", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "error-handler-workflow-id"
+  }
+}
