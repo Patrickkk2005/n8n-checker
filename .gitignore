@@ -37,7 +37,3 @@ node_modules/
 .cache/
 dist/
 
-server.py
-rules.py
-ai_analysis.py
-config.example.py

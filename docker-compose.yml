@@ -1,0 +1,8 @@
+services:
+  n8n-checker:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8765"
+    env_file:
+      - .env
